@@ -1,6 +1,8 @@
 #pragma once
 #include "openvr\openvr_driver.h"
 #include "driverlog.h"
+#include "TrackedDevice.h"
+#include "EventReceiver.h"
 
 #include <vector>
 #include <thread>
@@ -12,41 +14,17 @@
 #endif
 
 using namespace vr;
-static const char * const k_pch_Sample_Section = "driver_sample";
-static const char * const k_pch_Sample_SerialNumber_String = "serialNumber";
-static const char * const k_pch_Sample_ModelNumber_String = "modelNumber";
-static const char * const k_pch_Sample_WindowX_Int32 = "windowX";
-static const char * const k_pch_Sample_WindowY_Int32 = "windowY";
-static const char * const k_pch_Sample_WindowWidth_Int32 = "windowWidth";
-static const char * const k_pch_Sample_WindowHeight_Int32 = "windowHeight";
-static const char * const k_pch_Sample_RenderWidth_Int32 = "renderWidth";
-static const char * const k_pch_Sample_RenderHeight_Int32 = "renderHeight";
-static const char * const k_pch_Sample_SecondsFromVsyncToPhotons_Float = "secondsFromVsyncToPhotons";
-static const char * const k_pch_Sample_DisplayFrequency_Float = "displayFrequency";
 
-
-class HmdDevice : public vr::ITrackedDeviceServerDriver, public vr::IVRDisplayComponent
+class HmdDevice : public TrackedDevice, public vr::IVRDisplayComponent,public EventReceiver
 {
 public:
-	HmdDevice();
+	HmdDevice(std::string serialNumber, std::string modelNumber, std::string inputProfilePath);
 
-	virtual ~HmdDevice();
+	~HmdDevice();
 
-
-	virtual EVRInitError Activate(vr::TrackedDeviceIndex_t unObjectId);
-
-	void initPose();
-
-	virtual void Deactivate();
-
-	virtual void EnterStandby();
-
+	virtual EVRInitError Activate();
+	virtual void EnterStandby() {};
 	virtual void *GetComponent(const char *pchComponentNameAndVersion);
-
-	virtual void PowerOff();
-
-	/** debug request from a client */
-	virtual void DebugRequest(const char *pchRequest, char *pchResponseBuffer, uint32_t unResponseBufferSize);
 
 	virtual void GetWindowBounds(int32_t *pnX, int32_t *pnY, uint32_t *pnWidth, uint32_t *pnHeight);
 
@@ -62,18 +40,13 @@ public:
 
 	virtual DistortionCoordinates_t ComputeDistortion(EVREye eEye, float fU, float fV);
 	
-	virtual DriverPose_t GetPose();
+	virtual void keyEvent(int key, bool isdown);
+	virtual void mouseEvent(int x, int y);
+	virtual void updatePoseEvent(float deltatime = 0.01);
+	virtual void updatePoseEvent(vr::DriverPose_t base, float deltatime = 0.01);
 
-
-	void updatePose(float ms = 0.01);
-	void setMouseMove(int x, int y);
-	void setKeyDown(char key, bool isdown);
-	std::string GetSerialNumber() const;
-	vr::TrackedDeviceIndex_t m_unObjectId;
 private:
-	
-	
-	vr::PropertyContainerHandle_t m_ulPropertyContainer;
+
 	float a = 0;
 	float color = -1.0;
 	std::string m_sSerialNumber;
@@ -89,7 +62,6 @@ private:
 	float m_flDisplayFrequency;
 	float m_flIPD;
 	
-	DriverPose_t m_pose;
 	float mouseY=0;
 	float mouseX=0;
 

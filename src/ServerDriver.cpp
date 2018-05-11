@@ -10,11 +10,11 @@ EVRInitError ServerDriver::Init(vr::IVRDriverContext *pDriverContext)
 	InitDriverLog(vr::VRDriverLog());
 	isWorking = 1;
 	if (m_pNullHmdLatest == NULL)
-		m_pNullHmdLatest = new HmdDevice();
-	vr::VRServerDriverHost()->TrackedDeviceAdded("sampleHMD", vr::TrackedDeviceClass_HMD, m_pNullHmdLatest);
+		m_pNullHmdLatest = new HmdDevice("1234", "SampleHMD","{sample}/input/vive_profile.json");
+	vr::VRServerDriverHost()->TrackedDeviceAdded("1234", vr::TrackedDeviceClass_HMD, m_pNullHmdLatest);
 	if(m_rightHand == NULL)
-		m_rightHand = new ControllerDevice(TrackedControllerRole_RightHand);
-	vr::VRServerDriverHost()->TrackedDeviceAdded("sampleController", vr::TrackedDeviceClass_Controller, m_rightHand);
+		m_rightHand = new ControllerDevice("12341", "SampleLeftController","{sample}/input/vive_controller_profile.json",TrackedControllerRole_RightHand);
+	vr::VRServerDriverHost()->TrackedDeviceAdded("12341", vr::TrackedDeviceClass_Controller, m_rightHand);
 
 	m_Thread = new std::thread(updatePostThread);
 	return VRInitError_None;
@@ -50,18 +50,18 @@ void ServerDriver::setKeyDown(char key, bool isdown)
 {
 	if (m_pNullHmdLatest)
 	{
-		m_pNullHmdLatest->setKeyDown(key, isdown);
+		m_pNullHmdLatest->keyEvent(key, isdown);
 	}
 	if (m_rightHand)
 	{
-		m_rightHand->setKeyDown(key, isdown);
+		m_rightHand->keyEvent(key, isdown);
 	}
 }
 void ServerDriver::setMouseMove(int x, int y)
 {
 	if (m_pNullHmdLatest)
 	{
-		m_pNullHmdLatest->setMouseMove(x, y);
+		m_pNullHmdLatest->mouseEvent(x, y);
 	}
 }
 
@@ -72,12 +72,12 @@ void ServerDriver::updatePostThread()
 	{
 		if (m_pNullHmdLatest)
 		{
-			m_pNullHmdLatest->updatePose();
-			vr::VRServerDriverHost()->TrackedDevicePoseUpdated(m_pNullHmdLatest->m_unObjectId, m_pNullHmdLatest->GetPose(), sizeof(DriverPose_t));
+			m_pNullHmdLatest->updatePoseEvent();
+			vr::VRServerDriverHost()->TrackedDevicePoseUpdated(m_pNullHmdLatest->getDeviceId(), m_pNullHmdLatest->GetPose(), sizeof(DriverPose_t));
 			if (m_rightHand)
 			{
-				m_rightHand->updatePose(m_pNullHmdLatest->GetPose());
-				vr::VRServerDriverHost()->TrackedDevicePoseUpdated(m_rightHand->m_unObjectId, m_rightHand->GetPose(), sizeof(DriverPose_t));
+				m_rightHand->updatePoseEvent(m_pNullHmdLatest->GetPose());
+				vr::VRServerDriverHost()->TrackedDevicePoseUpdated(m_rightHand->getDeviceId(), m_rightHand->GetPose(), sizeof(DriverPose_t));
 			}
 		}
 		

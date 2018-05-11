@@ -171,10 +171,12 @@
     <ClInclude Include="ControllerDevice.h" />
     <ClInclude Include="driverlog.h" />
     <ClInclude Include="HookDll.h" />
+    <ClInclude Include="EventReceiver.h" />
     <ClInclude Include="mathTool.h" />
     <ClInclude Include="HmdDevice.h" />
     <ClInclude Include="openvr\openvr_driver.h" />
     <ClInclude Include="ServerDriver.h" />
+    <ClInclude Include="TrackedDevice.h" />
     <ClInclude Include="WatchdogDriver_Sample.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
