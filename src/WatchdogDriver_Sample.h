@@ -1,6 +1,6 @@
 #pragma once
 
-#include <openvr_driver.h>
+#include "openvr\openvr_driver.h"
 #include "driverlog.h"
 
 #include <thread>

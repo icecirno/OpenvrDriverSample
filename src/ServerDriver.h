@@ -1,5 +1,5 @@
 #pragma once
-#include <openvr_driver.h>
+#include "openvr\openvr_driver.h"
 #include "HmdDevice.h"
 #include "ControllerDevice.h"
 
