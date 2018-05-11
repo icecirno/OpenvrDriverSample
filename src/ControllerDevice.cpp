@@ -80,7 +80,7 @@ void ControllerDevice::initComponent()
 	DriverLog("ControllerDevice::initComponent:%d\n", vr::VRDriverInput()->CreateBooleanComponent(m_ulPropertyContainer, "/input/system/click", &m_steam));
 	DriverLog("ControllerDevice::initComponent:%d\n", vr::VRDriverInput()->CreateScalarComponent(m_ulPropertyContainer, "/input/trigger/value", &m_trigger, VRScalarType_Absolute, VRScalarUnits_NormalizedOneSided));
 }
-void ControllerDevice::updatePose(DriverPose_t& headPose, float ms = 0.01)
+void ControllerDevice::updatePose(DriverPose_t& headPose, float ms)
 {
 	color += 0.014f;
 	if (color >= 0.5)

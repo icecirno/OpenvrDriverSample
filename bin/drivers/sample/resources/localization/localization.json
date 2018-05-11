@@ -1,0 +1,12 @@
+[
+  {
+    "language_tag": "en_US",
+    "vive_controller" : "My Controller",
+    "vive_pro" : "My Controller Pro",
+    "vive" : "My Controller",
+    "/input/trigger" : "VTrigger",
+    "/input/volume_up" : "Volume Up",
+    "/input/volume_down" : "Volume Down",
+    "/input/mute_mic" : "Mute Mic"
+  }
+]

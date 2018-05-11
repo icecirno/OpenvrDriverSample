@@ -173,6 +173,7 @@
     <ClInclude Include="HookDll.h" />
     <ClInclude Include="mathTool.h" />
     <ClInclude Include="HmdDevice.h" />
+    <ClInclude Include="openvr\openvr_driver.h" />
     <ClInclude Include="ServerDriver.h" />
     <ClInclude Include="WatchdogDriver_Sample.h" />
   </ItemGroup>
