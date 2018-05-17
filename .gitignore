@@ -37,3 +37,8 @@
 *.log
 *.exp
 *.ilk
+bin/drivers/sample/bin/win64/driver_sample.iobj
+*.ipdb
+src/.vs/driver_sample/v14/.suo
+src/.vs/driver_sample/v14/.suo
+src/.vs/driver_sample/v14/.suo

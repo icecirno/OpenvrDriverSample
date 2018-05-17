@@ -2,7 +2,7 @@
 
 
 
-ControllerDevice::ControllerDevice(std::string serialNumber, std::string modelNumber, std::string inputProfilePath,ETrackedControllerRole role):TrackedDevice(serialNumber, modelNumber,inputProfilePath)
+ControllerDevice::ControllerDevice(std::string serialNumber, std::string modelNumber, std::string inputProfilePath,ETrackedControllerRole role):TrackedDevice(serialNumber, modelNumber,inputProfilePath, vr::TrackedDeviceClass_Controller)
 {
 	m_role = role;
 }
@@ -35,31 +35,37 @@ enum EVRButtonId
 	k_EButton_Max = 64
 };
 */
-EVRInitError ControllerDevice::Activate()
+EVRInitError ControllerDevice::Activate(TrackedDeviceIndex_t deviceId, PropertyContainerHandle_t propertyContainer)
 {
 	DriverLog("ControllerDevice::Activate\n");
 	vr::VRProperties()->SetStringProperty(propertyContainer, Prop_ManufacturerName_String,"sample");
 	vr::VRProperties()->SetInt32Property(propertyContainer, Prop_ControllerRoleHint_Int32, m_role);
 	vr::VRProperties()->SetUint64Property(propertyContainer, Prop_SupportedButtons_Uint64, 28);
 	vr::VRProperties()->SetInt32Property(propertyContainer, Prop_Axis0Type_Int32, 1);
-	initComponent();
+	InitInputComponent();
 	return EVRInitError::VRInitError_None;
 }
-void ControllerDevice::EnterStandby()
+void ControllerDevice::InitInputComponent()
 {
+	vr::VRDriverInput()->CreateBooleanComponent(getPropertyContainer(), "/input/system/click", &m_steam);
+	vr::VRDriverInput()->CreateScalarComponent(getPropertyContainer(), "/input/trigger/value", &m_trigger, VRScalarType_Absolute, VRScalarUnits_NormalizedOneSided);
 }
-void *ControllerDevice::GetComponent(const char *pchComponentNameAndVersion)
+void ControllerDevice::InitPoseEvent()
 {
-	return NULL;
-}
+	pose = { 0 };
+	pose.poseIsValid = true;
+	pose.result = TrackingResult_Running_OK;
+	pose.deviceIsConnected = true;
 
-ControllerDevice::~ControllerDevice()
-{
-}
-void ControllerDevice::initComponent()
-{
-	vr::VRDriverInput()->CreateBooleanComponent(propertyContainer, "/input/system/click", &m_steam);
-	vr::VRDriverInput()->CreateScalarComponent(propertyContainer, "/input/trigger/value", &m_trigger, VRScalarType_Absolute, VRScalarUnits_NormalizedOneSided);
+	pose.qWorldFromDriverRotation.w = 1.0f;
+	pose.qWorldFromDriverRotation.x = 0.0f;
+	pose.qWorldFromDriverRotation.y = 0.0f;
+	pose.qWorldFromDriverRotation.z = 0.0f;
+	pose.qDriverFromHeadRotation.w = 1.0f;
+	pose.qDriverFromHeadRotation.x = 0.0f;
+	pose.qDriverFromHeadRotation.y = 0.0f;
+	pose.qDriverFromHeadRotation.z = 0.0f;
+	pose.vecPosition[1] = 1.0;
 }
 
 void ControllerDevice::mouseEvent(int x, int y)
@@ -80,9 +86,11 @@ void ControllerDevice::updatePoseEvent(vr::DriverPose_t base, float deltatime)
 	pose.vecPosition[1] = base.vecPosition[1] + color;
 	pose.vecPosition[0] = base.vecPosition[0];
 	pose.vecPosition[2] = base.vecPosition[2];
+	updatePoseToSteam(pose);
 }
 void ControllerDevice::keyEvent(int key, bool isdown)
 {
+	DriverLog("ControllerDevice::setKeyDown:%d\n", key);
 	switch (key)
 	{
 	case 10:

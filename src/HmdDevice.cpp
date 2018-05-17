@@ -1,6 +1,6 @@
 #include "HmdDevice.h"
 
-HmdDevice::HmdDevice(std::string serialNumber, std::string modelNumber, std::string inputProfilePath):TrackedDevice(serialNumber, modelNumber, inputProfilePath)
+HmdDevice::HmdDevice(std::string serialNumber, std::string modelNumber, std::string inputProfilePath):TrackedDevice(serialNumber, modelNumber, inputProfilePath,vr::TrackedDeviceClass_HMD)
 {
 	m_flIPD = vr::VRSettings()->GetFloat(k_pch_SteamVR_Section, k_pch_SteamVR_IPD_Float);
 	m_nWindowX = vr::VRSettings()->GetInt32("driver_sample", "windowX");
@@ -17,8 +17,24 @@ HmdDevice::HmdDevice(std::string serialNumber, std::string modelNumber, std::str
 {
 }
 
+ void HmdDevice::InitPoseEvent()
+ {
 
- EVRInitError HmdDevice::Activate()
+	 pose.poseIsValid = true;
+	 pose.result = TrackingResult_Running_OK;
+	 pose.deviceIsConnected = true;
+
+	 pose.qWorldFromDriverRotation.w = 1.0f;
+	 pose.qWorldFromDriverRotation.x = 0.0f;
+	 pose.qWorldFromDriverRotation.y = 0.0f;
+	 pose.qWorldFromDriverRotation.z = 0.0f;
+	 pose.qDriverFromHeadRotation.w = 1.0f;
+	 pose.qDriverFromHeadRotation.x = 0.0f;
+	 pose.qDriverFromHeadRotation.y = 0.0f;
+	 pose.qDriverFromHeadRotation.z = 0.0f;
+	 pose.vecPosition[1] = 1.0;
+ }
+ EVRInitError HmdDevice::Activate(TrackedDeviceIndex_t deviceId, PropertyContainerHandle_t propertyContainer)
 {
 	vr::VRProperties()->SetFloatProperty(propertyContainer, Prop_UserIpdMeters_Float, m_flIPD);
 	vr::VRProperties()->SetFloatProperty(propertyContainer, Prop_UserHeadToEyeDepthMeters_Float, 0.f);
@@ -26,7 +42,7 @@ HmdDevice::HmdDevice(std::string serialNumber, std::string modelNumber, std::str
 	vr::VRProperties()->SetFloatProperty(propertyContainer, Prop_SecondsFromVsyncToPhotons_Float, m_flSecondsFromVsyncToPhotons);
 	vr::VRProperties()->SetUint64Property(propertyContainer, Prop_CurrentUniverseId_Uint64, 2);
 	vr::VRProperties()->SetBoolProperty(propertyContainer, Prop_IsOnDesktop_Bool, false);
-	pose.vecPosition[1] = 1.0;
+	
 	return VRInitError_None;
 }
 void * HmdDevice::GetComponent(const char *pchComponentNameAndVersion)
@@ -117,7 +133,7 @@ void * HmdDevice::GetComponent(const char *pchComponentNameAndVersion)
 		 r += 1.5;
 	 pose.vecPosition[0] += deltatime*( -f*sin(-mouseX / 180.0*3.1415)+r*sin((-mouseX + 90) / 180.0*3.1415) );
 	 pose.vecPosition[2] += deltatime*( f*cos(mouseX / 180.0*3.1415)-r*cos((mouseX - 90) / 180.0*3.1415));
-
+	 updatePoseToSteam(pose);
  }
  void HmdDevice::mouseEvent(int x, int y)
  {

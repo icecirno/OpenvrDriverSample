@@ -95,7 +95,6 @@ static void KeyBoardEventThreadFunction()
 		}
 		else if (msg.message == WM_CLOSELOOP)//get exit message form ServerDriver.Cleanup();
 			break;
-		
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}

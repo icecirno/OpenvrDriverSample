@@ -10,7 +10,6 @@ class ServerDriver : public IServerTrackedDeviceProvider
 {
 public:
 	ServerDriver()
-		:  m_bEnableNullDriver(false)
 	{
 	}
 
@@ -21,9 +20,9 @@ public:
 	virtual bool ShouldBlockStandbyMode() { return true; }
 	virtual void EnterStandby() {}
 	virtual void LeaveStandby() {}
-	void debug(const char* str, int i);
-	void debug(const char* str);
-	void setHookThread(DWORD threadId);
+	void debug(const char* str, int i){DriverLog(str, i);}
+	void debug(const char* str){DriverLog(str);}
+	void setHookThread(DWORD threadId){this->threadId = threadId;}
 	void setKeyDown(char key, bool isdown);
 	void setMouseMove(int x, int y);
 	
@@ -32,11 +31,9 @@ public:
 	static bool enableMouse;
 private:
 	DWORD threadId = 0;
-	static HmdDevice *m_pNullHmdLatest;
-	static ControllerDevice *m_rightHand;
-	
+	static HmdDevice *m_Hmd;
+	static std::vector<EventReceiver*> receivers;
 	std::thread * m_Thread = NULL;
-	bool m_bEnableNullDriver;
 };
 
 
